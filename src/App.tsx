@@ -1,23 +1,8 @@
 import { useState } from 'react';
-//import './App.css'
+
 import { useQuery } from '@tanstack/react-query';
 import { useDebounce } from 'use-debounce';
-
-// const authenticatedFetch = async () => {
-
-//   try {
-//     const response = await fetch(`https://api.themoviedb.org/3/authentication`, {
-//       headers: {
-//         'Authorization': `Bearer ${import.meta.env.VITE_THEMOVIEDB_API_KEY}`,
-//         'accept': 'application/json'
-//       }
-//     })
-//     await response.json()
-//   } catch (error) {
-//     console.error('Error authenticating for movies now playing:', error)
-//     throw error
-//   }
-// }
+import { fetchMoviesNowPlaying, fetchMoviesSearch } from './lib/movies';
 
 type Movie = {
   id: number;
@@ -25,40 +10,9 @@ type Movie = {
   poster_path: string;
 };
 
-const fetchMoviesNowPlaying = async () => {
-  try {
-    const response = await fetch(
-      'https://api.themoviedb.org/3/movie/now_playing',
-      {
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_THEMOVIEDB_API_KEY}`,
-          accept: 'application/json'
-        }
-      }
-    );
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching movies now playing:', error);
-    throw error;
-  }
-};
 
-const fetchMoviesSearch = async (search: string) => {
-  try {
-    const response = await fetch(`https://api.themoviedb.org/3/search/movie?query=${search}`, {
-      headers: {
-        Authorization: `Bearer ${import.meta.env.VITE_THEMOVIEDB_API_KEY}`,
-        accept: 'application/json'
-      }
-    });
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching movies search:', error);
-    throw error;
-  }
-};
 
-function App() {
+export function App() {
   const [search, setSearch] = useState('');
   const [debouncedSearch] = useDebounce(search, 500);
 
@@ -79,11 +33,7 @@ function App() {
 
   const movies = search ? searchData?.results : data?.results;
 
-
-  // console.log(data.results[1]);
-  // console.log(
-  //   `https://image.tmdb.org/t/p/original${data.results[1].poster_path}`
-  // );
+  //console.log({data, isLoading, error})
 
   return (
     <div className='container mx-auto'>
@@ -118,5 +68,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
