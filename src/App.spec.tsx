@@ -64,7 +64,8 @@ describe('Movies Playground App component', () => {
     render(<QueryClientProvider client={queryClient}><App /></QueryClientProvider>);
 
     await waitFor(() => {
-      expect(screen.getByText(/Loading.../i)).toBeInTheDocument();
+      //expect(screen.getByText(/Loading.../i)).toBeInTheDocument();
+      expect(screen.getByAltText(/Loading.../i)).toBeInTheDocument();
     });
   });
 });

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useDebounce } from 'use-debounce';
 import { fetchMoviesNowPlaying, fetchMoviesSearch } from './lib/movies';
+import Spinner from './assets/spinner.svg';
 
 type Movie = {
   id: number;
@@ -33,8 +34,6 @@ export function App() {
 
   const movies = search ? searchData?.results : data?.results;
 
-  //console.log({data, isLoading, error})
-
   return (
     <div className='container mx-auto'>
       <div className='my-8'>
@@ -51,14 +50,16 @@ export function App() {
         {searchData ? 'Search Results' : 'Movies Now Playing'}
       </h1>
 
-      {(isLoading || searchLoading) && <div className='text-center text-2xl font-bold mb-4'>Loading...</div>}
+      {(isLoading || searchLoading) && <div className='text-center text-2xl font-bold mb-4 flex justify-center items-center'>
+          <img src={Spinner} alt='Loading...' className='w-full h-full mx-auto' />
+      </div>}
       {(error || searchError) && <div className='text-center text-2xl font-bold mb-4'>Error: {error?.message || searchError?.message}</div>}
       {movies?.length === 0 && <div className='text-center text-2xl font-bold mb-4'>No movies found</div>}
       
       <div className='grid grid-cols-3 gap-2'>
         {movies?.map((movie: Movie) => (
           <div key={movie.id} className=' my-4'>
-            <h1 className='text-center mb-2 w-[250px] text-ellipsis overflow-hidden whitespace-nowrap'>{movie.title}</h1>
+            <h1 className='w-full text-center mb-2 w-[250px] text-ellipsis overflow-hidden whitespace-nowrap'>{movie.title}</h1>
             <div className='w-[200px] h-[300px] mx-auto'>
               <img className='w-full h-full object-contain' src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} alt={movie.title} />
             </div>
