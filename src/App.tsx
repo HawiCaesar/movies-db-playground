@@ -32,7 +32,8 @@ export function App() {
     enabled: debouncedSearch.length > 0
   })
 
-  const movies = search ? searchData?.results : data?.results;
+  console.log({searchResults: searchData?.results, nowPlayingResults: data?.results, debouncedSearch})
+  const movies = debouncedSearch ? searchData?.results : data?.results;
 
   return (
     <div className='container mx-auto'>
@@ -47,7 +48,7 @@ export function App() {
         <button className='bg-blue-500 text-white p-2 rounded-md' onClick={() => setSearch('')}>Clear</button>
       </div>
       <h1 className='text-center text-2xl font-bold mb-4'>
-        {searchData ? 'Search Results' : 'Movies Now Playing'}
+        {debouncedSearch.length && search.length > 0 ? 'Search Results' : 'Movies Now Playing'}
       </h1>
 
       {(isLoading || searchLoading) && <div className='text-center text-2xl font-bold mb-4 flex justify-center items-center'>
