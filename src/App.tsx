@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
 import { useDebounce } from 'use-debounce';
-import { fetchMoviesNowPlaying, fetchMoviesSearch } from './lib/movies';
+import { fetchMoviesAPICall } from './lib/movies';
 import Spinner from './assets/spinner.svg';
 
 type Movie = {
@@ -21,19 +21,23 @@ export function App() {
     setSearch(e.target.value);
   };
 
+  const isSearchMode = debouncedSearch.length > 0;
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['movies_now_playing'],
-    queryFn: fetchMoviesNowPlaying
+    queryFn: () => fetchMoviesAPICall('https://api.themoviedb.org/3/movie/now_playing')
   });
 
   const { data: searchData, isLoading: searchLoading, error: searchError } = useQuery({
     queryKey: ['movies_search', debouncedSearch],
-    queryFn: () => fetchMoviesSearch(debouncedSearch),
-    enabled: debouncedSearch.length > 0
+    queryFn: () => fetchMoviesAPICall(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(debouncedSearch)}`),
+    enabled: isSearchMode
   })
 
-  console.log({searchResults: searchData?.results, nowPlayingResults: data?.results, debouncedSearch})
   const movies = debouncedSearch ? searchData?.results : data?.results;
+
+  const activeError = isSearchMode ? searchError : error;
+  const activeLoading = isSearchMode ? searchLoading : isLoading;
 
   return (
     <div className='container mx-auto'>
@@ -48,14 +52,14 @@ export function App() {
         <button className='bg-blue-500 text-white p-2 rounded-md' onClick={() => setSearch('')}>Clear</button>
       </div>
       <h1 className='text-center text-2xl font-bold mb-4'>
-        {debouncedSearch.length && search.length > 0 ? 'Search Results' : 'Movies Now Playing'}
+        {isSearchMode ? 'Search Results' : 'Movies Now Playing'}
       </h1>
 
-      {(isLoading || searchLoading) && <div className='text-center text-2xl font-bold mb-4 flex justify-center items-center'>
+      {activeLoading && <div className='text-center text-2xl font-bold mb-4 flex justify-center items-center'>
           <img src={Spinner} alt='Loading...' className='w-full h-full mx-auto' />
       </div>}
-      {(error || searchError) && <div className='text-center text-2xl font-bold mb-4'>Error: {error?.message || searchError?.message}</div>}
-      {movies?.length === 0 && <div className='text-center text-2xl font-bold mb-4'>No movies found</div>}
+      {activeError && <div className='text-center text-2xl font-bold mb-4'>Error: {activeError?.message}</div>}
+      {!activeLoading && movies?.length === 0 && <div className='text-center text-2xl font-bold mb-4'>No movies found</div>}
       
       <div className='grid grid-cols-3 gap-2'>
         {movies?.map((movie: Movie) => (

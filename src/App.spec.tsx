@@ -3,13 +3,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { describe, it, expect } from 'vitest';
 import '@testing-library/jest-dom';
 import { App } from './App';
-import { fetchMoviesNowPlaying } from './lib/movies';
+import { fetchMoviesAPICall } from './lib/movies';
 
 vi.mock('./lib/movies', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./lib/movies')>();
   return {
     ...actual,
-    fetchMoviesNowPlaying: vi.fn(),
+    fetchMoviesAPICall: vi.fn(),
   };
 });
 
@@ -20,8 +20,8 @@ describe('Movies Playground App component', () => {
     queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } },
     });
-    vi.mocked(fetchMoviesNowPlaying).mockReset();
-    vi.mocked(fetchMoviesNowPlaying).mockResolvedValue({ results: [
+    vi.mocked(fetchMoviesAPICall).mockReset();
+    vi.mocked(fetchMoviesAPICall).mockResolvedValue({ results: [
       {
         id: 1,
         title: '2 Fast 2 Furious',
@@ -46,7 +46,7 @@ describe('Movies Playground App component', () => {
   });
 
   it('should throw an error if data is not fetched', async() => {
-    vi.mocked(fetchMoviesNowPlaying).mockRejectedValue(
+    vi.mocked(fetchMoviesAPICall).mockRejectedValue(
       new Error('Failed to fetch data')
     );
 
@@ -59,7 +59,7 @@ describe('Movies Playground App component', () => {
   });
 
   it('should show the loading state', async () => {
-    vi.mocked(fetchMoviesNowPlaying).mockResolvedValue({ results: [] });
+    vi.mocked(fetchMoviesAPICall).mockResolvedValue({ results: [] });
 
     render(<QueryClientProvider client={queryClient}><App /></QueryClientProvider>);
 
